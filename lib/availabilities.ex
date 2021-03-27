@@ -6,6 +6,10 @@ defmodule Availabilities do
   alias Availabilities.{Availability, Params, Schedule, TimeSlotSettings}
   alias Timex
 
+  ##############
+  # Public API #
+  ##############
+
   @doc """
   Returns the availability for a given store, or empty if the store is closed
   """
@@ -17,6 +21,10 @@ defmodule Availabilities do
     |> select_store_open_days(schedules)
     |> build_slots(slots, date)
     |> handle_response()
+
+  #################
+  # Private funcs #
+  #################
 
   @spec num_to_weekday(non_neg_integer | {:error, :invalid_date}) :: {:ok, Timex.weekday_name} | {:error, :invalid_date}
   defp num_to_weekday(1), do: {:ok, :monday}
