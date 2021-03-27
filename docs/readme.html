@@ -79,158 +79,158 @@ Store Availability
     <div id="content" class="content-inner">
 
 <h1>Store Availability Kata</h1><p>Store managers and end consumers of our e-commerce started asking our imaginary store for a way to have their orders scheduled at checkout, so that managers could better prepare their inventory for a given date and time and consumers could better know the time window they should wait for couriers to arrive at their location.</p><p>In order to meet this growing need from our user base we need to create a simple booking system and, as one of the core features of this system, we will need a module to calculate and return the available time slots for a given date, considering the store's schedule plus some additional params. This would ideally be a standalone module that would work pretty much like a lib imported into the main codebase and so far we only have a name for it (<a href="Availabilities.html"><code class="inline">Availabilities</code></a>) and some definitions for its API as we can see below:</p><p><strong>Input structs:</strong></p><pre><code class="makeup elixir"><span class="c1"># Settings for building time slots:</span><span class="w">
-</span><span class="n">settings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="5050003380-1">%</span><span class="nc" data-group-id="5050003380-1">Availabilities.TimeSlotSettings</span><span class="p" data-group-id="5050003380-1">{</span><span class="w">
+</span><span class="n">settings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="8310389853-1">%</span><span class="nc" data-group-id="8310389853-1">Availabilities.TimeSlotSettings</span><span class="p" data-group-id="8310389853-1">{</span><span class="w">
   </span><span class="ss">slot_recurrence</span><span class="p">:</span><span class="w"> </span><span class="mi">3600</span><span class="p">,</span><span class="w"> </span><span class="c1"># Time interval in seconds between successive availability slots e.g. 3600 =&gt; time slots: 09:00, 10:00, 11:00, ...</span><span class="w">
   </span><span class="ss">slot_duration</span><span class="p">:</span><span class="w"> </span><span class="mi">3600</span><span class="p">,</span><span class="w"> </span><span class="c1"># Duration of a booking in seconds. In our case it&#39;s the delivery time window for a scheduled order</span><span class="w">
-</span><span class="p" data-group-id="5050003380-1">}</span><span class="w">
+</span><span class="p" data-group-id="8310389853-1">}</span><span class="w">
 
 </span><span class="c1"># Store&#39;s weekly schedule:</span><span class="w">
-</span><span class="n">schedules</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="5050003380-2">[</span><span class="w">
-  </span><span class="p" data-group-id="5050003380-3">%</span><span class="nc" data-group-id="5050003380-3">Availabilities.Schedule</span><span class="p" data-group-id="5050003380-3">{</span><span class="w">
+</span><span class="n">schedules</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="8310389853-2">[</span><span class="w">
+  </span><span class="p" data-group-id="8310389853-3">%</span><span class="nc" data-group-id="8310389853-3">Availabilities.Schedule</span><span class="p" data-group-id="8310389853-3">{</span><span class="w">
     </span><span class="ss">weekday</span><span class="p">:</span><span class="w"> </span><span class="ss">:monday</span><span class="p">,</span><span class="w"> </span><span class="c1"># Week day in the weekly schedule</span><span class="w">
     </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[09:00:00]</span><span class="p">,</span><span class="w"> </span><span class="c1"># Time when the store opens</span><span class="w">
     </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[18:00:00]</span><span class="w"> </span><span class="c1"># Time when the store closes</span><span class="w">
-  </span><span class="p" data-group-id="5050003380-3">}</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="8310389853-3">}</span><span class="p">,</span><span class="w">
   </span><span class="n">...</span><span class="w">
-</span><span class="p" data-group-id="5050003380-2">]</span><span class="w">
+</span><span class="p" data-group-id="8310389853-2">]</span><span class="w">
 
 </span><span class="c1"># Params for calculating and building time slot availabilities:</span><span class="w">
-</span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="5050003380-4">%</span><span class="nc" data-group-id="5050003380-4">Availabilities.Params</span><span class="p" data-group-id="5050003380-4">{</span><span class="w">
+</span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="8310389853-4">%</span><span class="nc" data-group-id="8310389853-4">Availabilities.Params</span><span class="p" data-group-id="8310389853-4">{</span><span class="w">
   </span><span class="ss">settings</span><span class="p">:</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w">
   </span><span class="ss">schedules</span><span class="p">:</span><span class="w"> </span><span class="n">schedules</span><span class="w">
-</span><span class="p" data-group-id="5050003380-4">}</span><span class="w">
+</span><span class="p" data-group-id="8310389853-4">}</span><span class="w">
 </span></code></pre><p><strong>Output struct:</strong></p><pre><code class="makeup elixir"><span class="c1"># Resulting struct with availabilities for a date:</span><span class="w">
-</span><span class="p" data-group-id="7893593989-1">%</span><span class="nc" data-group-id="7893593989-1">Availabilities.Availability</span><span class="p" data-group-id="7893593989-1">{</span><span class="w">
+</span><span class="p" data-group-id="1738297120-1">%</span><span class="nc" data-group-id="1738297120-1">Availabilities.Availability</span><span class="p" data-group-id="1738297120-1">{</span><span class="w">
     </span><span class="ss">date</span><span class="p">:</span><span class="w"> </span><span class="ld">~D[2021-05-03]</span><span class="p">,</span><span class="w">
     </span><span class="ss">weekday</span><span class="p">:</span><span class="w"> </span><span class="ss">:monday</span><span class="p">,</span><span class="w"> 
-    </span><span class="ss">slots</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7893593989-2">[</span><span class="w">
-        </span><span class="p" data-group-id="7893593989-3">%{</span><span class="w">
+    </span><span class="ss">slots</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1738297120-2">[</span><span class="w">
+        </span><span class="p" data-group-id="1738297120-3">%{</span><span class="w">
           </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[09:00:00]</span><span class="p">,</span><span class="w"> </span><span class="c1"># Time slot start time</span><span class="w">
           </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[10:00:00]</span><span class="w"> </span><span class="c1"># Time slot end time</span><span class="w">
-     </span><span class="p" data-group-id="7893593989-3">}</span><span class="p">,</span><span class="w">
-        </span><span class="p" data-group-id="7893593989-4">%{</span><span class="w">
+     </span><span class="p" data-group-id="1738297120-3">}</span><span class="p">,</span><span class="w">
+        </span><span class="p" data-group-id="1738297120-4">%{</span><span class="w">
           </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[10:00:00]</span><span class="p">,</span><span class="w">
           </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[11:00:00]</span><span class="w">
-     </span><span class="p" data-group-id="7893593989-4">}</span><span class="p">,</span><span class="w">
+     </span><span class="p" data-group-id="1738297120-4">}</span><span class="p">,</span><span class="w">
          </span><span class="n">...</span><span class="w">
-    </span><span class="p" data-group-id="7893593989-2">]</span><span class="w">
-</span><span class="p" data-group-id="7893593989-1">}</span></code></pre><p>Knowing these data structures, now we need you to implement the <a href="Availabilities.html#build/2"><code class="inline">Availabilities.build/2</code></a> function, the one that will actually calculate and return time slot availabilities based on a date and params passed as its arguments (more in the example below).</p><h1>Sample Inputs</h1><pre><code class="makeup elixir"><span class="n">settings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="4713623911-1">%</span><span class="nc" data-group-id="4713623911-1">Availabilities.TimeSlotSettings</span><span class="p" data-group-id="4713623911-1">{</span><span class="w">
+    </span><span class="p" data-group-id="1738297120-2">]</span><span class="w">
+</span><span class="p" data-group-id="1738297120-1">}</span></code></pre><p>Knowing these data structures, now we need you to implement the <a href="Availabilities.html#build/2"><code class="inline">Availabilities.build/2</code></a> function, the one that will actually calculate and return time slot availabilities based on a date and params passed as its arguments (more in the example below).</p><h1>Sample Inputs</h1><pre><code class="makeup elixir"><span class="n">settings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="0808280152-1">%</span><span class="nc" data-group-id="0808280152-1">Availabilities.TimeSlotSettings</span><span class="p" data-group-id="0808280152-1">{</span><span class="w">
   </span><span class="ss">slot_recurrence</span><span class="p">:</span><span class="w"> </span><span class="mi">7200</span><span class="p">,</span><span class="w">
   </span><span class="ss">slot_duration</span><span class="p">:</span><span class="w"> </span><span class="mi">3600</span><span class="w">
-</span><span class="p" data-group-id="4713623911-1">}</span><span class="w">
+</span><span class="p" data-group-id="0808280152-1">}</span><span class="w">
 
-</span><span class="n">schedules</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="4713623911-2">[</span><span class="w">
-  </span><span class="p" data-group-id="4713623911-3">%</span><span class="nc" data-group-id="4713623911-3">Availabilities.Schedule</span><span class="p" data-group-id="4713623911-3">{</span><span class="w">
+</span><span class="n">schedules</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="0808280152-2">[</span><span class="w">
+  </span><span class="p" data-group-id="0808280152-3">%</span><span class="nc" data-group-id="0808280152-3">Availabilities.Schedule</span><span class="p" data-group-id="0808280152-3">{</span><span class="w">
     </span><span class="ss">weekday</span><span class="p">:</span><span class="w"> </span><span class="ss">:monday</span><span class="p">,</span><span class="w">
     </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[09:00:00]</span><span class="p">,</span><span class="w">
     </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[18:00:00]</span><span class="w">
-  </span><span class="p" data-group-id="4713623911-3">}</span><span class="p">,</span><span class="w">
-  </span><span class="p" data-group-id="4713623911-4">%</span><span class="nc" data-group-id="4713623911-4">Availabilities.Schedule</span><span class="p" data-group-id="4713623911-4">{</span><span class="w">
+  </span><span class="p" data-group-id="0808280152-3">}</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="0808280152-4">%</span><span class="nc" data-group-id="0808280152-4">Availabilities.Schedule</span><span class="p" data-group-id="0808280152-4">{</span><span class="w">
     </span><span class="ss">weekday</span><span class="p">:</span><span class="w"> </span><span class="ss">:wednesday</span><span class="p">,</span><span class="w">
     </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[13:00:00]</span><span class="p">,</span><span class="w">
     </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[18:00:00]</span><span class="w">
-  </span><span class="p" data-group-id="4713623911-4">}</span><span class="p">,</span><span class="w">
-  </span><span class="p" data-group-id="4713623911-5">%</span><span class="nc" data-group-id="4713623911-5">Availabilities.Schedule</span><span class="p" data-group-id="4713623911-5">{</span><span class="w">
+  </span><span class="p" data-group-id="0808280152-4">}</span><span class="p">,</span><span class="w">
+  </span><span class="p" data-group-id="0808280152-5">%</span><span class="nc" data-group-id="0808280152-5">Availabilities.Schedule</span><span class="p" data-group-id="0808280152-5">{</span><span class="w">
     </span><span class="ss">weekday</span><span class="p">:</span><span class="w"> </span><span class="ss">:friday</span><span class="p">,</span><span class="w">
     </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[09:00:00]</span><span class="p">,</span><span class="w">
     </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[13:00:00]</span><span class="w">
-  </span><span class="p" data-group-id="4713623911-5">}</span><span class="w">
-</span><span class="p" data-group-id="4713623911-2">]</span><span class="w">
+  </span><span class="p" data-group-id="0808280152-5">}</span><span class="w">
+</span><span class="p" data-group-id="0808280152-2">]</span><span class="w">
 
-</span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="4713623911-6">%</span><span class="nc" data-group-id="4713623911-6">Availabilities.Params</span><span class="p" data-group-id="4713623911-6">{</span><span class="w">
+</span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p" data-group-id="0808280152-6">%</span><span class="nc" data-group-id="0808280152-6">Availabilities.Params</span><span class="p" data-group-id="0808280152-6">{</span><span class="w">
   </span><span class="ss">settings</span><span class="p">:</span><span class="w"> </span><span class="n">settings</span><span class="p">,</span><span class="w">
   </span><span class="ss">schedules</span><span class="p">:</span><span class="w"> </span><span class="n">schedules</span><span class="w">
-</span><span class="p" data-group-id="4713623911-6">}</span></code></pre><h1>Expected Outputs</h1><h3 id="1-availabilities-for-a-monday-in-the-future" class="section-heading">
+</span><span class="p" data-group-id="0808280152-6">}</span></code></pre><h1>Expected Outputs</h1><h3 id="1-availabilities-for-a-monday-in-the-future" class="section-heading">
   <a href="#1-availabilities-for-a-monday-in-the-future" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
   1) Availabilities for a Monday in the future:
 </h3>
-<pre><code class="makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Availabities</span><span class="o">.</span><span class="n">build</span><span class="p" data-group-id="0871073974-1">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="ld">~D[2021-05-03]</span><span class="p" data-group-id="0871073974-1">)</span><span class="w">
-</span><span class="p" data-group-id="0871073974-2">[</span><span class="w">
-  </span><span class="p" data-group-id="0871073974-3">%</span><span class="nc" data-group-id="0871073974-3">Availabities.Availability</span><span class="p" data-group-id="0871073974-3">{</span><span class="w">
+<pre><code class="makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Availabities</span><span class="o">.</span><span class="n">build</span><span class="p" data-group-id="4773959702-1">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="ld">~D[2021-05-03]</span><span class="p" data-group-id="4773959702-1">)</span><span class="w">
+</span><span class="p" data-group-id="4773959702-2">[</span><span class="w">
+  </span><span class="p" data-group-id="4773959702-3">%</span><span class="nc" data-group-id="4773959702-3">Availabities.Availability</span><span class="p" data-group-id="4773959702-3">{</span><span class="w">
     </span><span class="ss">date</span><span class="p">:</span><span class="w"> </span><span class="ld">~D[2021-05-03]</span><span class="p">,</span><span class="w">
     </span><span class="ss">weekday</span><span class="p">:</span><span class="w"> </span><span class="ss">:monday</span><span class="p">,</span><span class="w">
-    </span><span class="ss">slots</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="0871073974-4">[</span><span class="w">
-      </span><span class="p" data-group-id="0871073974-5">%{</span><span class="w">
+    </span><span class="ss">slots</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="4773959702-4">[</span><span class="w">
+      </span><span class="p" data-group-id="4773959702-5">%{</span><span class="w">
         </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[09:00:00]</span><span class="p">,</span><span class="w">
         </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[10:00:00]</span><span class="w">
-      </span><span class="p" data-group-id="0871073974-5">}</span><span class="p">,</span><span class="w">
-      </span><span class="p" data-group-id="0871073974-6">%{</span><span class="w">
+      </span><span class="p" data-group-id="4773959702-5">}</span><span class="p">,</span><span class="w">
+      </span><span class="p" data-group-id="4773959702-6">%{</span><span class="w">
         </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[11:00:00]</span><span class="p">,</span><span class="w">
         </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[12:00:00]</span><span class="w">
-      </span><span class="p" data-group-id="0871073974-6">}</span><span class="p">,</span><span class="w">
-      </span><span class="p" data-group-id="0871073974-7">%{</span><span class="w">
+      </span><span class="p" data-group-id="4773959702-6">}</span><span class="p">,</span><span class="w">
+      </span><span class="p" data-group-id="4773959702-7">%{</span><span class="w">
         </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[13:00:00]</span><span class="p">,</span><span class="w">
         </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[14:00:00]</span><span class="w">
-      </span><span class="p" data-group-id="0871073974-7">}</span><span class="p">,</span><span class="w">
-      </span><span class="p" data-group-id="0871073974-8">%{</span><span class="w">
+      </span><span class="p" data-group-id="4773959702-7">}</span><span class="p">,</span><span class="w">
+      </span><span class="p" data-group-id="4773959702-8">%{</span><span class="w">
         </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[15:00:00]</span><span class="p">,</span><span class="w">
         </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[16:00:00]</span><span class="w">
-      </span><span class="p" data-group-id="0871073974-8">}</span><span class="p">,</span><span class="w">
-      </span><span class="p" data-group-id="0871073974-9">%{</span><span class="w">
+      </span><span class="p" data-group-id="4773959702-8">}</span><span class="p">,</span><span class="w">
+      </span><span class="p" data-group-id="4773959702-9">%{</span><span class="w">
         </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[17:00:00]</span><span class="p">,</span><span class="w">
         </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[18:00:00]</span><span class="w">
-      </span><span class="p" data-group-id="0871073974-9">}</span><span class="w">
-    </span><span class="p" data-group-id="0871073974-4">]</span><span class="w">
-  </span><span class="p" data-group-id="0871073974-3">}</span><span class="w">
-</span><span class="p" data-group-id="0871073974-2">]</span></code></pre><h3 id="2-availabilities-for-a-wednesday-in-the-future" class="section-heading">
+      </span><span class="p" data-group-id="4773959702-9">}</span><span class="w">
+    </span><span class="p" data-group-id="4773959702-4">]</span><span class="w">
+  </span><span class="p" data-group-id="4773959702-3">}</span><span class="w">
+</span><span class="p" data-group-id="4773959702-2">]</span></code></pre><h3 id="2-availabilities-for-a-wednesday-in-the-future" class="section-heading">
   <a href="#2-availabilities-for-a-wednesday-in-the-future" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
   2) Availabilities for a Wednesday in the future:
 </h3>
-<pre><code class="makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Availabities</span><span class="o">.</span><span class="n">build</span><span class="p" data-group-id="1054304543-1">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="ld">~D[2021-06-16]</span><span class="p" data-group-id="1054304543-1">)</span><span class="w">
-</span><span class="p" data-group-id="1054304543-2">[</span><span class="w">
-  </span><span class="p" data-group-id="1054304543-3">%</span><span class="nc" data-group-id="1054304543-3">Availabities.Availability</span><span class="p" data-group-id="1054304543-3">{</span><span class="w">
+<pre><code class="makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Availabities</span><span class="o">.</span><span class="n">build</span><span class="p" data-group-id="7494871199-1">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="ld">~D[2021-06-16]</span><span class="p" data-group-id="7494871199-1">)</span><span class="w">
+</span><span class="p" data-group-id="7494871199-2">[</span><span class="w">
+  </span><span class="p" data-group-id="7494871199-3">%</span><span class="nc" data-group-id="7494871199-3">Availabities.Availability</span><span class="p" data-group-id="7494871199-3">{</span><span class="w">
     </span><span class="ss">date</span><span class="p">:</span><span class="w"> </span><span class="ld">~D[2021-06-16]</span><span class="p">,</span><span class="w">
     </span><span class="ss">weekday</span><span class="p">:</span><span class="w"> </span><span class="ss">:wednesday</span><span class="p">,</span><span class="w">
-    </span><span class="ss">slots</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="1054304543-4">[</span><span class="w">
-      </span><span class="p" data-group-id="1054304543-5">%{</span><span class="w">
+    </span><span class="ss">slots</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="7494871199-4">[</span><span class="w">
+      </span><span class="p" data-group-id="7494871199-5">%{</span><span class="w">
         </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[13:00:00]</span><span class="p">,</span><span class="w">
         </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[14:00:00]</span><span class="w">
-      </span><span class="p" data-group-id="1054304543-5">}</span><span class="p">,</span><span class="w">
-      </span><span class="p" data-group-id="1054304543-6">%{</span><span class="w">
+      </span><span class="p" data-group-id="7494871199-5">}</span><span class="p">,</span><span class="w">
+      </span><span class="p" data-group-id="7494871199-6">%{</span><span class="w">
         </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[15:00:00]</span><span class="p">,</span><span class="w">
         </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[16:00:00]</span><span class="w">
-      </span><span class="p" data-group-id="1054304543-6">}</span><span class="p">,</span><span class="w">
-      </span><span class="p" data-group-id="1054304543-7">%{</span><span class="w">
+      </span><span class="p" data-group-id="7494871199-6">}</span><span class="p">,</span><span class="w">
+      </span><span class="p" data-group-id="7494871199-7">%{</span><span class="w">
         </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[17:00:00]</span><span class="p">,</span><span class="w">
         </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[18:00:00]</span><span class="w">
-      </span><span class="p" data-group-id="1054304543-7">}</span><span class="w">
-    </span><span class="p" data-group-id="1054304543-4">]</span><span class="w">
-  </span><span class="p" data-group-id="1054304543-3">}</span><span class="w">
-</span><span class="p" data-group-id="1054304543-2">]</span></code></pre><h3 id="3-availabilities-for-a-friday-in-the-future" class="section-heading">
+      </span><span class="p" data-group-id="7494871199-7">}</span><span class="w">
+    </span><span class="p" data-group-id="7494871199-4">]</span><span class="w">
+  </span><span class="p" data-group-id="7494871199-3">}</span><span class="w">
+</span><span class="p" data-group-id="7494871199-2">]</span></code></pre><h3 id="3-availabilities-for-a-friday-in-the-future" class="section-heading">
   <a href="#3-availabilities-for-a-friday-in-the-future" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
   3) Availabilities for a Friday in the future:
 </h3>
-<pre><code class="makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Availabities</span><span class="o">.</span><span class="n">build</span><span class="p" data-group-id="3306914773-1">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="ld">~D[2021-07-30]</span><span class="p" data-group-id="3306914773-1">)</span><span class="w">
-</span><span class="p" data-group-id="3306914773-2">[</span><span class="w">
-  </span><span class="p" data-group-id="3306914773-3">%</span><span class="nc" data-group-id="3306914773-3">Availabities.Availability</span><span class="p" data-group-id="3306914773-3">{</span><span class="w">
+<pre><code class="makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Availabities</span><span class="o">.</span><span class="n">build</span><span class="p" data-group-id="3292816871-1">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="ld">~D[2021-07-30]</span><span class="p" data-group-id="3292816871-1">)</span><span class="w">
+</span><span class="p" data-group-id="3292816871-2">[</span><span class="w">
+  </span><span class="p" data-group-id="3292816871-3">%</span><span class="nc" data-group-id="3292816871-3">Availabities.Availability</span><span class="p" data-group-id="3292816871-3">{</span><span class="w">
     </span><span class="ss">date</span><span class="p">:</span><span class="w"> </span><span class="ld">~D[2021-07-30]</span><span class="p">,</span><span class="w">
     </span><span class="ss">weekday</span><span class="p">:</span><span class="w"> </span><span class="ss">:friday</span><span class="p">,</span><span class="w">
-    </span><span class="ss">slots</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3306914773-4">[</span><span class="w">
-      </span><span class="p" data-group-id="3306914773-5">%{</span><span class="w">
+    </span><span class="ss">slots</span><span class="p">:</span><span class="w"> </span><span class="p" data-group-id="3292816871-4">[</span><span class="w">
+      </span><span class="p" data-group-id="3292816871-5">%{</span><span class="w">
                 </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[09:00:00]</span><span class="p">,</span><span class="w">
                 </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[10:00:00]</span><span class="w">
-      </span><span class="p" data-group-id="3306914773-5">}</span><span class="p">,</span><span class="w">
-      </span><span class="p" data-group-id="3306914773-6">%{</span><span class="w">
+      </span><span class="p" data-group-id="3292816871-5">}</span><span class="p">,</span><span class="w">
+      </span><span class="p" data-group-id="3292816871-6">%{</span><span class="w">
         </span><span class="ss">start_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[11:00:00]</span><span class="p">,</span><span class="w">
         </span><span class="ss">end_time</span><span class="p">:</span><span class="w"> </span><span class="ld">~T[12:00:00]</span><span class="w">
-      </span><span class="p" data-group-id="3306914773-6">}</span><span class="w">
-    </span><span class="p" data-group-id="3306914773-4">]</span><span class="w">
-  </span><span class="p" data-group-id="3306914773-3">}</span><span class="w">
-</span><span class="p" data-group-id="3306914773-2">]</span></code></pre><h3 id="4-availabilities-for-a-date-with-no-daily-schedule" class="section-heading">
+      </span><span class="p" data-group-id="3292816871-6">}</span><span class="w">
+    </span><span class="p" data-group-id="3292816871-4">]</span><span class="w">
+  </span><span class="p" data-group-id="3292816871-3">}</span><span class="w">
+</span><span class="p" data-group-id="3292816871-2">]</span></code></pre><h3 id="4-availabilities-for-a-date-with-no-daily-schedule" class="section-heading">
   <a href="#4-availabilities-for-a-date-with-no-daily-schedule" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
   4) Availabilities for a date with no daily schedule:
 </h3>
-<pre><code class="makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Availabities</span><span class="o">.</span><span class="n">build</span><span class="p" data-group-id="3980453874-1">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="ld">~D[2021-07-29]</span><span class="p" data-group-id="3980453874-1">)</span><span class="w">
-</span><span class="p" data-group-id="3980453874-2">[</span><span class="p" data-group-id="3980453874-2">]</span></code></pre><h2 id="installation" class="section-heading">
+<pre><code class="makeup elixir"><span class="gp unselectable">iex&gt; </span><span class="nc">Availabities</span><span class="o">.</span><span class="n">build</span><span class="p" data-group-id="8909854213-1">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="ld">~D[2021-07-29]</span><span class="p" data-group-id="8909854213-1">)</span><span class="w">
+</span><span class="p" data-group-id="8909854213-2">[</span><span class="p" data-group-id="8909854213-2">]</span></code></pre><h2 id="installation" class="section-heading">
   <a href="#installation" class="hover-link"><span class="icon-link" aria-hidden="true"></span></a>
   Installation
 </h2>
 <p>If <a href="https://hex.pm/docs/publish">available in Hex</a>, the package can be installed
-by adding <code class="inline">availabilities</code> to your list of dependencies in <code class="inline">mix.exs</code>:</p><pre><code class="makeup elixir"><span class="kd">def</span><span class="w"> </span><span class="nf">deps</span><span class="w"> </span><span class="k" data-group-id="4706008146-1">do</span><span class="w">
-  </span><span class="p" data-group-id="4706008146-2">[</span><span class="w">
-    </span><span class="p" data-group-id="4706008146-3">{</span><span class="ss">:availabilities</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;~&gt; 0.1.0&quot;</span><span class="p" data-group-id="4706008146-3">}</span><span class="w">
-  </span><span class="p" data-group-id="4706008146-2">]</span><span class="w">
-</span><span class="k" data-group-id="4706008146-1">end</span></code></pre>
+by adding <code class="inline">availabilities</code> to your list of dependencies in <code class="inline">mix.exs</code>:</p><pre><code class="makeup elixir"><span class="kd">def</span><span class="w"> </span><span class="nf">deps</span><span class="w"> </span><span class="k" data-group-id="2033480301-1">do</span><span class="w">
+  </span><span class="p" data-group-id="2033480301-2">[</span><span class="w">
+    </span><span class="p" data-group-id="2033480301-3">{</span><span class="ss">:availabilities</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;~&gt; 0.1.0&quot;</span><span class="p" data-group-id="2033480301-3">}</span><span class="w">
+  </span><span class="p" data-group-id="2033480301-2">]</span><span class="w">
+</span><span class="k" data-group-id="2033480301-1">end</span></code></pre>
 <div class="bottom-actions">
   <div class="bottom-actions-item">
 
