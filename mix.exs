@@ -22,7 +22,7 @@ defmodule Availabilities.MixProject do
   defp deps do
     [
       {:typed_struct, "~> 0.2.1"},
-      {:timex, "~> 3.0"},
+      {:timex, "~> 3.6"},
 
       # Dev
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
