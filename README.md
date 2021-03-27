@@ -59,7 +59,7 @@ Knowing these data structures, now we need you to implement the `Availabilities.
 
 ```elixir
 settings = %Availabilities.TimeSlotSettings{
-  slot_recurrence: 1800,
+  slot_recurrence: 7200,
   slot_duration: 3600
 }
 
