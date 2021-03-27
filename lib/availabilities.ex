@@ -38,7 +38,6 @@ defmodule Availabilities do
   defp store_open?(weekday, %Schedule{weekday: schedule_weekday}), do:
     weekday == schedule_weekday
 
-
   defp build_slots({:ok, []}, _slots, _date), do: {:ok, :store_closed}
 
   defp build_slots({:ok, [schedule]}, %TimeSlotSettings{slot_recurrrence: recurrence, slot_duration: duration}, date) do
@@ -62,7 +61,7 @@ defmodule Availabilities do
       start_time: Time.truncate(current_time, :second),
       end_time: current_time |> Time.add(duration, :second) |> Time.truncate(:second)
     }
-    new_slots = [ slot | slots]
+    new_slots = [slot | slots]
     slots_in_schedule(start_time, end_time, recurrence, duration, Time.add(current_time, recurrence, :second), new_slots)
   end
 
