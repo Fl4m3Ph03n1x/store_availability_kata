@@ -38,7 +38,6 @@ defmodule Availabilities.MixProject do
 
   defp docs(),
     do: [
-      main: "Store Availability",
       extras: ["README.md"],
       output: "docs"
     ]

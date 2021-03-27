@@ -10,7 +10,7 @@
     <title>Availabilities — Store Availability v0.1.0</title>
     <link rel="stylesheet" href="dist/elixir-a172fe91e725dcb259e2.css" />
 
-    <script src="dist/sidebar_items-7034f47636.js"></script>
+    <script src="dist/sidebar_items-9632545dde.js"></script>
 
       <script src="docs_config.js"></script>
 
@@ -53,7 +53,7 @@
 
   <div class="sidebar-header">
     <div class="sidebar-projectDetails">
-      <a href="Store Availability.html" class="sidebar-projectName">
+      <a href="api-reference.html" class="sidebar-projectName">
 Store Availability
       </a>
       <strong class="sidebar-projectVersion">
@@ -103,6 +103,32 @@ Availabilities <small class="app-vsn">(Store Availability v0.1.0)</small>
             Summary
           </h1>
 
+  <div class="summary-types summary">
+    <h2>
+      <a href="#types">Types</a>
+    </h2>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:time_slot/0">time_slot()</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Represents a time slot. Time slots have a begining and an end, and the end must never be before
+its beginning.</p></div>
+
+</div>
+<div class="summary-row">
+  <div class="summary-signature">
+    <a href="#t:weekday_name/0">weekday_name()</a>
+
+  </div>
+
+    <div class="summary-synopsis"><p>Day of the week in human friendly format.</p></div>
+
+</div>
+
+  </div>
+
   <div class="summary-functions summary">
     <h2>
       <a href="#functions">Functions</a>
@@ -122,6 +148,79 @@ Availabilities <small class="app-vsn">(Store Availability v0.1.0)</small>
         </section>
 
 
+        <section id="types" class="details-list">
+          <h1 class="section-heading">
+            <a class="hover-link" href="#types">
+              <span class="icon-link" aria-hidden="true"></span>
+              <span class="sr-only">Link to this section</span>
+            </a>
+Types
+          </h1>
+          <div class="types-list">
+<section class="detail" id="t:time_slot/0">
+
+  <div class="detail-header">
+    <a href="#t:time_slot/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">time_slot()</h1>
+
+      <a href="https://github.com/Fl4m3Ph03n1x/store_availability_kata/blob/master/lib/availabilities.ex#L22" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <h2>Specs</h2>
+      <div class="specs">
+
+          <pre>time_slot() :: %{start_time: <a href="https://hexdocs.pm/elixir/Time.html#t:t/0">Time.t</a>(), end_time: <a href="https://hexdocs.pm/elixir/Time.html#t:t/0">Time.t</a>()}</pre>
+
+      </div>
+
+<p>Represents a time slot. Time slots have a begining and an end, and the end must never be before
+its beginning.</p>
+  </section>
+</section>
+<section class="detail" id="t:weekday_name/0">
+
+  <div class="detail-header">
+    <a href="#t:weekday_name/0" class="detail-link" title="Link to this type">
+      <span class="icon-link" aria-hidden="true"></span>
+      <span class="sr-only">Link to this type</span>
+    </a>
+    <h1 class="signature">weekday_name()</h1>
+
+      <a href="https://github.com/Fl4m3Ph03n1x/store_availability_kata/blob/master/lib/availabilities.ex#L15" class="view-source" rel="help" title="View Source">
+       <span class="icon-code" aria-hidden="true"></span>
+       <span class="sr-only">View Source</span>
+     </a>
+
+
+  </div>
+
+  <section class="docstring">
+
+      <h2>Specs</h2>
+      <div class="specs">
+
+          <pre>weekday_name() ::
+  :monday | :tuesday | :wednesday | :thursday | :friday | :saturday | :sunday</pre>
+
+      </div>
+
+<p>Day of the week in human friendly format.</p>
+  </section>
+</section>
+
+          </div>
+        </section>
+
         <section id="functions" class="details-list">
           <h1 class="section-heading">
             <a class="hover-link" href="#functions">
@@ -140,7 +239,7 @@ Functions
     </a>
     <h1 class="signature">build(params, date)</h1>
 
-      <a href="https://github.com/Fl4m3Ph03n1x/store_availability_kata/blob/master/lib/availabilities.ex#L17" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/Fl4m3Ph03n1x/store_availability_kata/blob/master/lib/availabilities.ex#L35" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
