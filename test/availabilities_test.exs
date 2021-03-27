@@ -5,7 +5,7 @@ defmodule AvailabilitiesTest do
   alias Availabilities.{Availability, Schedule, TimeSlotSettings}
 
   describe "build" do
-    test "returns availabilities for given day if there are slots for it" do
+    test "returns availabilities for given day if there are slots for it and slot recurrence == slot duration" do
       # arrange
       settings = %TimeSlotSettings{
         slot_recurrrence: 3_600,
@@ -58,6 +58,54 @@ defmodule AvailabilitiesTest do
             %{
               start_time: ~T[12:00:00],
               end_time: ~T[13:00:00]
+            },
+            %{
+              start_time: ~T[13:00:00],
+              end_time: ~T[14:00:00]
+            }
+          ]
+        }
+      ]
+
+      # assert
+      assert actual == expected
+    end
+
+    test "returns availabilities for given day if there are slots for it and slot recurrence > slot duration" do
+      # arrange
+      settings = %TimeSlotSettings{
+        slot_recurrrence: 7_200,
+        slot_duration: 3_600
+      }
+
+      schedules = [
+        %Schedule{
+          weekday: :monday,
+          start_time: ~T[09:00:00],
+          end_time: ~T[14:00:00]
+        }
+      ]
+
+      params = %Availabilities.Params{
+        settings: settings,
+        schedules: schedules
+      }
+
+      # #act
+      actual = Availabilities.build(params, ~D[2021-05-03])
+
+      expected = [
+        %Availability{
+          date: ~D[2021-05-03],
+          weekday: :monday,
+          slots: [
+            %{
+              start_time: ~T[09:00:00],
+              end_time: ~T[10:00:00]
+            },
+            %{
+              start_time: ~T[11:00:00],
+              end_time: ~T[12:00:00]
             },
             %{
               start_time: ~T[13:00:00],
