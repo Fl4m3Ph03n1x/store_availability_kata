@@ -1,6 +1,6 @@
 # Store Availability Kata
 
-Store managers and end consumers of our e-commerce started asking us for a way to have their orders scheduled at checkout, so that managers could better prepare their inventory for a given date and time and consumers could better know the time window they should wait for couriers to arrive at their location.
+Store managers and end consumers of our e-commerce started asking our imaginary store for a way to have their orders scheduled at checkout, so that managers could better prepare their inventory for a given date and time and consumers could better know the time window they should wait for couriers to arrive at their location.
 
 In order to meet this growing need from our user base we need to create a simple booking system and, as one of the core features of this system, we will need a module to calculate and return the available time slots for a given date, considering the store's schedule plus some additional params. This would ideally be a standalone module that would work pretty much like a lib imported into the main codebase and so far we only have a name for it (`Availabilities`) and some definitions for its API as we can see below:
 

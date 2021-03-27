@@ -25,3 +25,6 @@ availabilities-*.tar
 
 # Temporary files for e.g. tests
 /tmp
+
+# Dialyzer files
+/.elixir_ls
