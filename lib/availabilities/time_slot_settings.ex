@@ -9,7 +9,7 @@ defmodule Availabilities.TimeSlotSettings do
   typedstruct do
     @typedoc "A time slot setting"
 
-    field :slot_recurrrence, non_neg_integer, enforce: true
-    field :slot_duration, non_neg_integer, enforce: true
+    field(:slot_recurrrence, non_neg_integer, enforce: true)
+    field(:slot_duration, non_neg_integer, enforce: true)
   end
 end

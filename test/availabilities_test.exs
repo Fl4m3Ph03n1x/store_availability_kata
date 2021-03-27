@@ -2,12 +2,11 @@ defmodule AvailabilitiesTest do
   use ExUnit.Case
 
   alias Availabilities
-  alias Availabilities.{TimeSlotSettings, Schedule, Availability}
+  alias Availabilities.{Availability, Schedule, TimeSlotSettings}
 
   describe "build" do
-
     test "returns availabilities for given day if there are slots for it" do
-      #arrange
+      # arrange
       settings = %TimeSlotSettings{
         slot_recurrrence: 3_600,
         slot_duration: 3_600
@@ -38,6 +37,7 @@ defmodule AvailabilitiesTest do
 
       # #act
       actual = Availabilities.build(params, ~D[2021-05-03])
+
       expected = [
         %Availability{
           date: ~D[2021-05-03],
@@ -72,7 +72,7 @@ defmodule AvailabilitiesTest do
     end
 
     test "returns empty availabilities for given day if the store is closed" do
-      #arrange
+      # arrange
       settings = %TimeSlotSettings{
         slot_recurrrence: 3_600,
         slot_duration: 3_600
@@ -99,5 +99,4 @@ defmodule AvailabilitiesTest do
       assert actual == expected
     end
   end
-
 end

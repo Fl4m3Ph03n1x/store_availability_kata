@@ -24,7 +24,7 @@ defmodule Availabilities.MixProject do
       {:typed_struct, "~> 0.2.1"},
       {:timex, "~> 3.0"},
 
-      #Dev
+      # Dev
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false}

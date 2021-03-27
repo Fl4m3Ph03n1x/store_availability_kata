@@ -6,12 +6,12 @@ defmodule Availabilities.Params do
 
   use TypedStruct
 
-  alias Availabilities.{TimeSlotSettings, Schedule}
+  alias Availabilities.{Schedule, TimeSlotSettings}
 
   typedstruct do
     @typedoc "The parameters"
 
-    field :settings, TimeSlotSettings.t, enforce: true
-    field :schedules, [Schedule.t], enforce: true
+    field(:settings, TimeSlotSettings.t(), enforce: true)
+    field(:schedules, [Schedule.t()], enforce: true)
   end
 end

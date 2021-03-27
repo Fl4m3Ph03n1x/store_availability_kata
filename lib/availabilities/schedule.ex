@@ -10,8 +10,8 @@ defmodule Availabilities.Schedule do
   typedstruct do
     @typedoc "A schedule"
 
-    field :weekday, Timex.weekday_name, enforce: true
-    field :start_time, Time.t, enforce: true
-    field :end_time, Time.t, enforce: true
+    field(:weekday, Timex.weekday_name(), enforce: true)
+    field(:start_time, Time.t(), enforce: true)
+    field(:end_time, Time.t(), enforce: true)
   end
 end
