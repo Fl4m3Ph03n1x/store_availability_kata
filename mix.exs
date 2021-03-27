@@ -27,7 +27,6 @@ defmodule Availabilities.MixProject do
   defp deps do
     [
       {:typed_struct, "~> 0.2.1"},
-      {:timex, "~> 3.6"},
 
       # Dev
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
@@ -37,11 +36,10 @@ defmodule Availabilities.MixProject do
     ]
   end
 
-  defp docs(), do:
-    [
+  defp docs(),
+    do: [
       main: "Store Availability",
       extras: ["README.md"],
       output: "docs"
     ]
-
 end

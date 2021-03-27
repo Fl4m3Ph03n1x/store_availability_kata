@@ -4,7 +4,25 @@ defmodule Availabilities do
   """
 
   alias Availabilities.{Availability, Params, Schedule, TimeSlotSettings}
-  alias Timex
+
+  #########
+  # Types #
+  #########
+
+  @typedoc """
+  Day of the week in human friendly format.
+  """
+  @type weekday_name ::
+          :monday | :tuesday | :wednesday | :thursday | :friday | :saturday | :sunday
+
+  @typedoc """
+  Represents a time slot. Time slots have a begining and an end, and the end must never be before
+  its beginning.
+  """
+  @type time_slot :: %{
+          start_time: Time.t(),
+          end_time: Time.t()
+        }
 
   ##############
   # Public API #
@@ -17,7 +35,7 @@ defmodule Availabilities do
   def build(%Params{schedules: schedules, settings: slots}, date),
     do:
       date
-      |> Timex.weekday()
+      |> Date.day_of_week()
       |> num_to_weekday()
       |> select_store_open_days(schedules)
       |> build_slots(slots, date)
@@ -28,7 +46,7 @@ defmodule Availabilities do
   #################
 
   @spec num_to_weekday(non_neg_integer | {:error, :invalid_date}) ::
-          {:ok, Timex.weekday_name()} | {:error, :invalid_date}
+          {:ok, weekday_name()} | {:error, :invalid_date}
   defp num_to_weekday(1), do: {:ok, :monday}
   defp num_to_weekday(2), do: {:ok, :tuesday}
   defp num_to_weekday(3), do: {:ok, :wednesday}
@@ -36,9 +54,9 @@ defmodule Availabilities do
   defp num_to_weekday(5), do: {:ok, :friday}
   defp num_to_weekday(6), do: {:ok, :saturday}
   defp num_to_weekday(7), do: {:ok, :sunday}
-  defp num_to_weekday(error), do: error
+  defp num_to_weekday(_invalid_day), do: {:error, :invalid_date}
 
-  @spec select_store_open_days({:ok, Timex.weekday_name()} | {:error, :invalid_date}, [
+  @spec select_store_open_days({:ok, weekday_name()} | {:error, :invalid_date}, [
           Schedule.t()
         ]) :: {:ok, [Schedule.t()]} | {:error, :invalid_date}
   defp select_store_open_days({:ok, weekday}, schedules),
@@ -46,7 +64,7 @@ defmodule Availabilities do
 
   defp select_store_open_days({:error, _reason} = error, _schedules), do: error
 
-  @spec store_open?(Timex.weekday_name(), Schedule.t()) :: boolean
+  @spec store_open?(weekday_name(), Schedule.t()) :: boolean
   defp store_open?(weekday, %Schedule{weekday: schedule_weekday}), do: weekday == schedule_weekday
 
   @spec build_slots(
@@ -74,8 +92,10 @@ defmodule Availabilities do
 
   defp build_slots({:error, _reason} = error, _slots, _date), do: error
 
-  @spec slots_in_schedule(Time.t(), Time.t(), non_neg_integer, non_neg_integer, Time.t(), [map]) ::
-          [map]
+  @spec slots_in_schedule(Time.t(), Time.t(), non_neg_integer, non_neg_integer, Time.t(), [
+          time_slot
+        ]) ::
+          [time_slot]
   defp slots_in_schedule(start_time, end_time, recurrence, duration, current_time, slots \\ [])
 
   defp slots_in_schedule(start_time, end_time, recurrence, duration, current_time, slots)

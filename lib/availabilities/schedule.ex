@@ -5,12 +5,12 @@ defmodule Availabilities.Schedule do
 
   use TypedStruct
 
-  alias Timex
+  alias Availabilities
 
   typedstruct do
     @typedoc "A schedule"
 
-    field(:weekday, Timex.weekday_name(), enforce: true)
+    field(:weekday, Availabilities.weekday_name(), enforce: true)
     field(:start_time, Time.t(), enforce: true)
     field(:end_time, Time.t(), enforce: true)
   end

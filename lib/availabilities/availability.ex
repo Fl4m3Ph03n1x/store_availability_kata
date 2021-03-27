@@ -6,13 +6,13 @@ defmodule Availabilities.Availability do
 
   use TypedStruct
 
-  alias Timex
+  alias Availabilities
 
   typedstruct do
     @typedoc "The availability"
 
     field(:date, Date.t(), enforce: true)
-    field(:weekday, Timex.weekday_name(), enforce: true)
+    field(:weekday, Availabilities.weekday_name(), enforce: true)
     field(:slots, [%{start_time: Time.t(), end_time: Time.t()}], enforce: true)
   end
 end
