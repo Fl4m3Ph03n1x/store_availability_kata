@@ -37,6 +37,7 @@ jobs:
       run: mix test
     - name: Run Coverage
       run: mix coveralls.github
-    - name: Run dialzyer
+    - name: Run typechecks
       run: mix dialyzer
-
+      env:
+        MIX_ENV: dev
