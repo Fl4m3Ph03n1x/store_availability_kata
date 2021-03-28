@@ -45,52 +45,45 @@ defmodule Availabilities do
   # Private funcs #
   #################
 
-  @spec num_to_weekday(non_neg_integer | {:error, :invalid_date}) ::
-          {:ok, weekday_name()} | {:error, :invalid_date}
-  defp num_to_weekday(1), do: {:ok, :monday}
-  defp num_to_weekday(2), do: {:ok, :tuesday}
-  defp num_to_weekday(3), do: {:ok, :wednesday}
-  defp num_to_weekday(4), do: {:ok, :thursday}
-  defp num_to_weekday(5), do: {:ok, :friday}
-  defp num_to_weekday(6), do: {:ok, :saturday}
-  defp num_to_weekday(7), do: {:ok, :sunday}
-  defp num_to_weekday(_invalid_day), do: {:error, :invalid_date}
+  @spec num_to_weekday(non_neg_integer) :: weekday_name()
+  defp num_to_weekday(1), do: :monday
+  defp num_to_weekday(2), do: :tuesday
+  defp num_to_weekday(3), do: :wednesday
+  defp num_to_weekday(4), do: :thursday
+  defp num_to_weekday(5), do: :friday
+  defp num_to_weekday(6), do: :saturday
+  defp num_to_weekday(7), do: :sunday
 
-  @spec select_store_open_days({:ok, weekday_name()} | {:error, :invalid_date}, [
+  @spec select_store_open_days(weekday_name(), [
           Schedule.t()
-        ]) :: {:ok, [Schedule.t()]} | {:error, :invalid_date}
-  defp select_store_open_days({:ok, weekday}, schedules),
-    do: {:ok, Enum.filter(schedules, &store_open?(weekday, &1))}
-
-  defp select_store_open_days({:error, _reason} = error, _schedules), do: error
+        ]) :: [Schedule.t()]
+  defp select_store_open_days(weekday, schedules),
+    do: Enum.filter(schedules, &store_open?(weekday, &1))
 
   @spec store_open?(weekday_name(), Schedule.t()) :: boolean
   defp store_open?(weekday, %Schedule{weekday: schedule_weekday}), do: weekday == schedule_weekday
 
   @spec build_slots(
-          {:ok, [Schedule.t()]} | {:error, :invalid_date},
+          [Schedule.t()],
           TimeSlotSettings.t(),
           Date.t()
-        ) :: {:ok, :store_closed} | {:ok, Availability.t()} | {:error, :invalid_date}
-  defp build_slots({:ok, []}, _slots, _date), do: {:ok, :store_closed}
+        ) :: :store_closed | Availability.t()
+  defp build_slots([], _slots, _date), do: :store_closed
 
   defp build_slots(
-         {:ok, [schedule]},
+         [schedule],
          %TimeSlotSettings{slot_recurrrence: recurrence, slot_duration: duration},
          date
        ) do
     start_time = schedule.start_time
     end_time = schedule.end_time
 
-    {:ok,
-     %Availability{
-       weekday: schedule.weekday,
-       date: date,
-       slots: slots_in_schedule(start_time, end_time, recurrence, duration, start_time)
-     }}
+    %Availability{
+      weekday: schedule.weekday,
+      date: date,
+      slots: slots_in_schedule(start_time, end_time, recurrence, duration, start_time)
+    }
   end
-
-  defp build_slots({:error, _reason} = error, _slots, _date), do: error
 
   @spec slots_in_schedule(Time.t(), Time.t(), non_neg_integer, non_neg_integer, Time.t(), [
           time_slot
@@ -121,9 +114,7 @@ defmodule Availabilities do
        when current_time >= end_time,
        do: Enum.reverse(slots)
 
-  @spec handle_response({:ok, :store_closed | Availability.t()} | {:error, any}) ::
-          {:ok, [Availability.t()]} | {:error, any}
-  defp handle_response({:ok, :store_closed}), do: []
-  defp handle_response({:ok, data}), do: [data]
-  defp handle_response(error), do: error
+  @spec handle_response(:store_closed | Availability.t()) :: [Availability.t()]
+  defp handle_response(:store_closed), do: []
+  defp handle_response(data), do: [data]
 end
