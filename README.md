@@ -1,9 +1,11 @@
 # Store Availability Kata
 
+[![Elixir CI](https://github.com/Fl4m3Ph03n1x/store_availability_kata/actions/workflows/elixir.yml/badge.svg?branch=main)](https://github.com/Fl4m3Ph03n1x/store_availability_kata/actions/workflows/elixir.yml)
+
 <p align="center">
-    <a href="https://github.com/Fl4m3Ph03n1x/store_availability_kata/workflows/build/badge.svg?branch=main">
-        <img src="https://github.com/Fl4m3Ph03n1x/store_availability_kata/workflows/build/badge.svg?branch=main" alt="Build Status"/>
-    </a>
+    
+    [![Elixir CI](https://github.com/Fl4m3Ph03n1x/store_availability_kata/actions/workflows/elixir.yml/badge.svg)](https://github.com/Fl4m3Ph03n1x/store_availability_kata/actions/workflows/elixir.yml)
+    
     <a href="https://coveralls.io/github/Fl4m3Ph03n1x/store_availability_kata?branch=main">
         <img src="https://coveralls.io/repos/github/Fl4m3Ph03n1x/store_availability_kata/badge.svg?branch=main" alt="Coverage Status"/>
     </a>
