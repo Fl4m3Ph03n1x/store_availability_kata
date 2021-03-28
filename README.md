@@ -1,8 +1,6 @@
-# `[Store Availability Kata](https://fl4m3ph03n1x.github.io/store_availability_kata/)
+# [Store Availability Kata](https://fl4m3ph03n1x.github.io/store_availability_kata/)
 
-[![Elixir CI](https://github.com/Fl4m3Ph03n1x/store_availability_kata/actions/workflows/elixir.yml/badge.svg?branch=main)](https://github.com/Fl4m3Ph03n1x/store_availability_kata/actions/workflows/elixir.yml)
-
-[![Coverage Status](https://coveralls.io/repos/github/Fl4m3Ph03n1x/store_availability_kata/badge.svg?branch=main)](https://coveralls.io/github/Fl4m3Ph03n1x/store_availability_kata?branch=main)
+[![Elixir CI](https://github.com/Fl4m3Ph03n1x/store_availability_kata/actions/workflows/elixir.yml/badge.svg?branch=main)](https://github.com/Fl4m3Ph03n1x/store_availability_kata/actions/workflows/elixir.yml) [![Coverage Status](https://coveralls.io/repos/github/Fl4m3Ph03n1x/store_availability_kata/badge.svg?branch=main)](https://coveralls.io/github/Fl4m3Ph03n1x/store_availability_kata?branch=main)
 
 Store managers and end consumers of our e-commerce started asking our imaginary store for a way to have their orders scheduled at checkout, so that managers could better prepare their inventory for a given date and time and consumers could better know the time window they should wait for couriers to arrive at their location.
 
